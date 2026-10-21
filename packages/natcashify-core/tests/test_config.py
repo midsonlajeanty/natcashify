@@ -119,3 +119,31 @@ def test_parse_bool_accepts_common_spellings(value: object, expected: bool) -> N
 def test_parse_bool_rejects_everything_else(value: object) -> None:
     with pytest.raises(ConfigurationError, match="flag"):
         parse_bool("flag", value)
+
+
+@pytest.mark.parametrize("field", list(VALID))
+@pytest.mark.parametrize("value", ["   ", "\t\n", None, 0, b"key"])
+def test_blank_or_non_string_credentials_are_rejected(field: str, value: object) -> None:
+    with pytest.raises(ConfigurationError, match=field):
+        build({field: value})
+
+
+@pytest.mark.parametrize("value", [None, 0, 12345, b"F1", ["F1"]])
+def test_from_env_rejects_non_string_values_without_echoing_them(value: object) -> None:
+    with pytest.raises(ConfigurationError, match="NATCASH_FUNCTION_CODE") as caught:
+        MerchantConfig.from_env(environ={**ENV, "NATCASH_FUNCTION_CODE": value})
+    assert "None" not in str(caught.value)
+    assert "12345" not in str(caught.value)
+
+
+@pytest.mark.parametrize("value", ["", "   ", "\t"])
+def test_from_env_rejects_blank_values(value: str) -> None:
+    with pytest.raises(ConfigurationError, match="NATCASH_PASSWORD"):
+        MerchantConfig.from_env(environ={**ENV, "NATCASH_PASSWORD": value})
+
+
+def test_from_env_never_echoes_a_rejected_secret() -> None:
+    with pytest.raises(ConfigurationError) as caught:
+        MerchantConfig.from_env(environ={**ENV, "NATCASH_PRIVATE_KEY": "  "})
+    assert "NATCASH_PRIVATE_KEY" in str(caught.value)
+    assert "'  '" not in str(caught.value)

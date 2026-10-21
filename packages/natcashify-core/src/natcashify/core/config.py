@@ -19,6 +19,10 @@ _CREDENTIALS = (
 _MASKED = frozenset({"private_key", "password"})
 
 
+def _is_filled(value: object) -> bool:
+    return isinstance(value, str) and bool(value.strip())
+
+
 class Language(StrEnum):
     HT = "ht"
     FR = "fr"
@@ -52,8 +56,8 @@ class MerchantConfig:
 
     def __post_init__(self) -> None:
         for name in _CREDENTIALS:
-            if not getattr(self, name):
-                raise ConfigurationError(f"{name} must not be empty")
+            if not _is_filled(getattr(self, name)):
+                raise ConfigurationError(f"{name} must be a non-empty string")
         parts = urlsplit(self.callback_url)
         if parts.scheme not in {"http", "https"} or not parts.netloc:
             raise ConfigurationError("callback_url must be an absolute http(s) URL")
@@ -75,7 +79,10 @@ class MerchantConfig:
             key = f"{prefix}{name.upper()}"
             if key not in source:
                 raise ConfigurationError(f"Missing environment variable {key}")
-            values[name] = str(source[key])
+            value = source[key]
+            if not isinstance(value, str) or not _is_filled(value):
+                raise ConfigurationError(f"{key} must be a non-empty string")
+            values[name] = value
         fee_key = f"{prefix}ENABLE_FEE"
         language_key = f"{prefix}LANGUAGE"
         try:
