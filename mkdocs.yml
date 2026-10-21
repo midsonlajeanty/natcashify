@@ -1,0 +1,85 @@
+site_name: Natcashify
+site_description: A typed Python SDK for the NatCash payment gateway.
+repo_url: https://github.com/midsonlajeanty/natcashify
+site_url: https://midsonlajeanty.github.io/natcashify/
+repo_name: midsonlajeanty/natcashify
+edit_uri: edit/main/docs/
+strict: true
+
+theme:
+  name: material
+  features:
+    - content.code.copy
+    - content.tabs.link
+    - navigation.sections
+    - navigation.top
+    - search.suggest
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+plugins:
+  - search
+  - llmstxt:
+      full_output: llms-full.txt
+      markdown_description: >
+        Natcashify is a typed Python SDK for the NatCash online payment gateway of Natcom (Haiti).
+        It creates a checkout session and returns its URL, verifies and parses the signed NatCash
+        callback, and retrieves a transaction by order number, with a sync and an async client that
+        share one surface. The default environment is the sandbox. The core depends only on the
+        standard library; optional adapters cover Django, FastAPI and Flask. Python 3.12 or newer
+        is required. Install with `pip install natcashify` or `pip install "natcashify[django]"`
+        (also `[fastapi]`, `[flask]`).
+      sections:
+        Getting started:
+          - index.md
+          - getting-started.md
+        Guide:
+          - payments.md
+          - callbacks.md
+          - transactions.md
+          - errors.md
+          - transports.md
+        Migration:
+          - moncashify.md
+        Integrations:
+          - integrations/*.md
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+
+nav:
+  - Introduction: index.md
+  - Getting started: getting-started.md
+  - Guide:
+      - Payments: payments.md
+      - Callbacks: callbacks.md
+      - Transactions: transactions.md
+      - Errors: errors.md
+      - Custom transports: transports.md
+  - Migration:
+      - From moncashify: moncashify.md
+  - Integrations:
+      - Django: integrations/django.md
+      - FastAPI: integrations/fastapi.md
+      - Flask: integrations/flask.md
