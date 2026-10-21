@@ -1,11 +1,17 @@
 import json
 from collections import deque
 
+from natcashify.core.config import MerchantConfig
 from natcashify.core.http import HttpRequest, HttpResponse
+from natcashify.core.signing import callback_signature
 
 
 def json_response(payload: object, status: int = 200) -> HttpResponse:
     return HttpResponse(status, {"Content-Type": "application/json"}, json.dumps(payload).encode())
+
+
+def sign_callback(config: MerchantConfig, order_number: str, code: int) -> str:
+    return callback_signature(config, order_number=order_number, code=code)
 
 
 class FakeTransport:

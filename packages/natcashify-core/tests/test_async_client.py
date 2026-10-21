@@ -9,8 +9,7 @@ from test_client import ENV, PAYMENT_OK, transaction_ok
 from natcashify.core.client import AsyncNatcashClient
 from natcashify.core.errors import APIError, ConfigurationError, InvalidPaymentError
 from natcashify.core.protocol import LIVE_URL, SANDBOX_URL
-from natcashify.core.signing import callback_signature
-from natcashify.core.testing import AsyncFakeTransport, json_response
+from natcashify.core.testing import AsyncFakeTransport, json_response, sign_callback
 
 
 async def test_create_payment_posts_to_the_sandbox_by_default() -> None:
@@ -61,7 +60,7 @@ async def test_get_transaction_rejects_a_different_order() -> None:
 
 async def test_callbacks_are_synchronous() -> None:
     client = AsyncNatcashClient(CONFIG, transport=AsyncFakeTransport())
-    signature = callback_signature(CONFIG, order_number="O1", code=1)
+    signature = sign_callback(CONFIG, "O1", 1)
     assert client.verify_callback("O1", 1, signature)
     params = {"orderNumber": "O1", "code": "1", "signature": signature}
     assert client.parse_callback(params).is_successful

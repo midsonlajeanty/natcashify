@@ -60,3 +60,6 @@ app.dependency_overrides[get_async_natcash_client] = lambda: AsyncNatcashClient.
     environ=ENV, transport=AsyncFakeTransport()
 )
 ```
+
+Sign test callbacks with `sign_callback`, see
+[Getting started](../getting-started.md#testing-your-own-code).

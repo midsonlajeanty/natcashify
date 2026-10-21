@@ -128,5 +128,20 @@ assert transport.requests[0].url.endswith("/credential")
 `HttpRequest` objects they receive in `requests`, and raise `AssertionError` when the queue is
 empty. `json_response(payload, status=200)` builds a response.
 
+`sign_callback(config, order_number, code)` returns the signature NatCash would send, so you can
+drive your callback endpoint with a callback that verifies:
+
+```python
+from natcashify.core.testing import sign_callback
+
+query = {
+    "orderNumber": "ORDER-001",
+    "code": "1",
+    "signature": sign_callback(config, "ORDER-001", 1),
+}
+callback = client.parse_callback(query)
+assert callback.is_successful
+```
+
 See [`examples/script.py`](https://github.com/midsonlajeanty/natcashify/blob/main/examples/script.py)
 for a complete run.

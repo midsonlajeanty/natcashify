@@ -2,8 +2,7 @@ from decimal import Decimal
 from importlib.resources import files
 
 from natcashify import MerchantConfig, NatcashClient, TransactionStatus
-from natcashify.core.signing import callback_signature
-from natcashify.core.testing import FakeTransport, json_response
+from natcashify.core.testing import FakeTransport, json_response, sign_callback
 
 PORTIONS = ("core", "django", "fastapi", "flask")
 
@@ -48,7 +47,7 @@ with NatcashClient(config, transport=transport) as client:
         {
             "orderNumber": "ORDER-001",
             "code": "1",
-            "signature": callback_signature(config, order_number="ORDER-001", code=1),
+            "signature": sign_callback(config, "ORDER-001", 1),
         }
     )
     assert callback.status is TransactionStatus.SUCCESS

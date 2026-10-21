@@ -70,5 +70,5 @@ def create_app() -> Flask:
 
 ## Testing
 
-Pass a transport: `Natcash(app, transport=FakeTransport(...))`, see
-[Getting started](../getting-started.md#testing-your-own-code).
+Pass a transport: `Natcash(app, transport=FakeTransport(...))`, and sign test callbacks with
+`sign_callback`, see [Getting started](../getting-started.md#testing-your-own-code).

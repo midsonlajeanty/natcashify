@@ -15,7 +15,7 @@ from natcashify.core.errors import (
     TransactionNotFoundError,
 )
 from natcashify.core.protocol import DEFAULT_TIMEOUT, LIVE_URL, SANDBOX_URL
-from natcashify.core.testing import FakeTransport, json_response
+from natcashify.core.testing import FakeTransport, json_response, sign_callback
 
 PAYMENT_OK: dict[str, Any] = {
     "status": 0,
@@ -129,10 +129,8 @@ def test_invalid_timeout_is_rejected(timeout: float) -> None:
 
 
 def test_verify_and_parse_callback() -> None:
-    from natcashify.core.signing import callback_signature
-
     client = NatcashClient(CONFIG, transport=FakeTransport())
-    signature = callback_signature(CONFIG, order_number="O1", code=1)
+    signature = sign_callback(CONFIG, "O1", 1)
     assert client.verify_callback("O1", 1, signature)
     assert not client.verify_callback("O1", -1, signature)
     callback = client.parse_callback({"orderNumber": "O1", "code": "1", "signature": signature})

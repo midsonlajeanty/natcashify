@@ -50,7 +50,8 @@ comes before fulfilling.
 - An unknown response code maps to `TransactionStatus.UNKNOWN` instead of raising.
 - Every failure derives from `NatcashError`: `ConfigurationError`, `InvalidPaymentError`,
   `InvalidSignatureError`, `TransportError`, `APIError` (and `TransactionNotFoundError`).
-- `natcashify.core.testing` ships `FakeTransport` and `AsyncFakeTransport` for your own tests.
+- `natcashify.core.testing` ships `FakeTransport`, `AsyncFakeTransport` and `sign_callback` for
+  your own tests.
 
 ## Documentation
 

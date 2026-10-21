@@ -3,8 +3,7 @@ from decimal import Decimal
 from fastapi import FastAPI
 
 from natcashify import AsyncNatcashClient, MerchantConfig
-from natcashify.core.signing import callback_signature
-from natcashify.core.testing import AsyncFakeTransport, json_response
+from natcashify.core.testing import AsyncFakeTransport, json_response, sign_callback
 from natcashify.fastapi import NatcashCallback, get_async_natcash_client
 
 ORDERS = {"ORDER-001": Decimal("250")}
@@ -48,6 +47,6 @@ async def callback(callback: NatcashCallback) -> dict[str, str]:
 if __name__ == "__main__":
     from fastapi.testclient import TestClient
 
-    signature = callback_signature(CONFIG, order_number="ORDER-001", code=1)
+    signature = sign_callback(CONFIG, "ORDER-001", 1)
     query = {"orderNumber": "ORDER-001", "code": "1", "signature": signature}
     print(TestClient(app).get("/natcash/callback", params=query).json())

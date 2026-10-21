@@ -40,3 +40,27 @@ def test_the_core_source_imports_only_the_standard_library() -> None:
         if module.split(".")[0] not in allowed
     ]
     assert offenders == []
+
+
+ROOT: Final = Path(__file__).parents[2]
+PUBLIC_SURFACES: Final = (
+    "examples",
+    "scripts",
+    "docs",
+    "packages/natcashify/src",
+    "packages/natcashify-django",
+    "packages/natcashify-fastapi",
+    "packages/natcashify-flask",
+)
+
+
+def test_nothing_outside_the_core_imports_the_signing_internals() -> None:
+    offenders = [
+        str(path.relative_to(ROOT))
+        for surface in PUBLIC_SURFACES
+        for path in (ROOT / surface).rglob("*")
+        if path.suffix in {".py", ".md"}
+        and "superpowers" not in path.parts
+        and "natcashify.core.signing" in path.read_text(encoding="utf-8")
+    ]
+    assert offenders == []

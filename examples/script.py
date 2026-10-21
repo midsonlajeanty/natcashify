@@ -1,8 +1,7 @@
 from decimal import Decimal
 
 from natcashify import MerchantConfig, NatcashClient
-from natcashify.core.signing import callback_signature
-from natcashify.core.testing import FakeTransport, json_response
+from natcashify.core.testing import FakeTransport, json_response, sign_callback
 
 config = MerchantConfig(
     private_key="private-key",
@@ -45,7 +44,7 @@ with NatcashClient(config, transport=transport) as client:
     query = {
         "orderNumber": "ORDER-001",
         "code": "1",
-        "signature": callback_signature(config, order_number="ORDER-001", code=1),
+        "signature": sign_callback(config, "ORDER-001", 1),
     }
     callback = client.parse_callback(query)
     transaction = client.get_transaction(callback.order_number)

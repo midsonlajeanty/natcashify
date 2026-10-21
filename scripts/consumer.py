@@ -13,7 +13,7 @@ from natcashify import (
     Transaction,
     TransactionStatus,
 )
-from natcashify.core.testing import FakeTransport
+from natcashify.core.testing import FakeTransport, sign_callback
 from natcashify.django import natcash_callback
 from natcashify.fastapi import NatcashCallback
 from natcashify.flask import Natcash
@@ -39,6 +39,14 @@ def lookup(order_number: str) -> Transaction | None:
         return client.get_transaction(order_number)
     except APIError:
         return None
+
+
+def signed_query(order_number: str) -> dict[str, str]:
+    return {
+        "orderNumber": order_number,
+        "code": "1",
+        "signature": sign_callback(config, order_number, 1),
+    }
 
 
 def status_name(callback: Callback) -> str:

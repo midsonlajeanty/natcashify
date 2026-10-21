@@ -4,8 +4,7 @@ from flask import Flask
 from flask.typing import ResponseReturnValue
 
 from natcashify import Callback, MerchantConfig
-from natcashify.core.signing import callback_signature
-from natcashify.core.testing import FakeTransport, json_response
+from natcashify.core.testing import FakeTransport, json_response, sign_callback
 from natcashify.flask import Natcash
 
 ORDERS = {"ORDER-001": Decimal("250")}
@@ -49,6 +48,6 @@ def callback(callback: Callback) -> ResponseReturnValue:
 
 if __name__ == "__main__":
     config = MerchantConfig.from_env(environ=CONFIG)
-    signature = callback_signature(config, order_number="ORDER-001", code=1)
+    signature = sign_callback(config, "ORDER-001", 1)
     query = {"orderNumber": "ORDER-001", "code": "1", "signature": signature}
     print(app.test_client().get("/natcash/callback", query_string=query).get_json())
