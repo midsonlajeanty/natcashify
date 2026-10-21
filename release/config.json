@@ -14,7 +14,8 @@
         "packages/natcashify-django/pyproject.toml",
         "packages/natcashify-fastapi/pyproject.toml",
         "packages/natcashify-flask/pyproject.toml"
-      ]
+      ],
+      "release-as": "0.1.0"
     }
   }
 }
