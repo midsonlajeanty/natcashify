@@ -1,8 +1,7 @@
+import json
 import tomllib
 from pathlib import Path
 from typing import Any, Final
-
-import pytest
 
 ROOT: Final = Path(__file__).parents[2]
 PACKAGES: Final = ROOT / "packages"
@@ -59,6 +58,8 @@ def test_every_portion_has_a_typecheck_symlink() -> None:
         assert link.resolve() == portion.resolve(), portion.name
 
 
-@pytest.mark.skip(reason="the release configuration is added with the release workflows")
 def test_every_package_is_listed_in_release_config() -> None:
-    raise NotImplementedError
+    config = json.loads((ROOT / "release" / "config.json").read_text(encoding="utf-8"))
+    extra_files = set(config["packages"]["."]["extra-files"])
+    expected = {f"packages/{package.name}/pyproject.toml" for package in _package_dirs()}
+    assert extra_files == expected
