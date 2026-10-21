@@ -1,5 +1,4 @@
 import json
-import math
 import re
 import time
 import uuid
@@ -202,7 +201,7 @@ def parse_payment_response(
     if not isinstance(url, str) or not _is_http_url(url):
         raise _malformed(response, "url")
     seconds = _number(payload.get("expiredAt"))
-    if seconds is None or not math.isfinite(seconds) or not 0 <= seconds <= _MAX_EXPIRY_SECONDS:
+    if seconds is None or not 0 <= seconds <= _MAX_EXPIRY_SECONDS:
         raise _malformed(response, "expiredAt")
     return Payment(url, timedelta(seconds=seconds), order_number, request_id)
 

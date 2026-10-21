@@ -219,6 +219,7 @@ def test_non_zero_status_raises(status: int, error: type[APIError]) -> None:
         json_response({"status": 0, "url": "https://x", "expiredAt": 1e300}),
         json_response({"status": 0, "url": "https://x", "expiredAt": 10**20}),
         json_response({"status": 0, "url": "https://x", "expiredAt": -1}),
+        HttpResponse(200, {}, b'{"status":0,"url":"https://x","expiredAt":1' + b"0" * 400 + b"}"),
         json_response({"status": 0, "url": "https://x", "expiredAt": True}),
         HttpResponse(200, {}, b'{"status":0,"url":"https://x","expiredAt":Infinity}'),
         HttpResponse(200, {}, b'{"status":0,"url":"https://x","expiredAt":NaN}'),
