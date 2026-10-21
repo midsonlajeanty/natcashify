@@ -48,6 +48,11 @@ def now_ms() -> int:
     return time.time_ns() // 1_000_000
 
 
+def _require_order_number(order_number: object) -> None:
+    if not isinstance(order_number, str) or not order_number.strip():
+        raise InvalidPaymentError("order_number must be a non-empty string")
+
+
 def validate_payment(
     order_number: str,
     amount: Decimal | int,
@@ -55,8 +60,7 @@ def validate_payment(
     *,
     skip_phone_input: bool,
 ) -> Decimal:
-    if not order_number:
-        raise InvalidPaymentError("order_number must not be empty")
+    _require_order_number(order_number)
     validated = validate_amount(amount)
     if phone_number is None:
         if skip_phone_input:
@@ -124,8 +128,7 @@ def build_transaction_request(
     order_number: str,
     request_id: str,
 ) -> HttpRequest:
-    if not order_number:
-        raise InvalidPaymentError("order_number must not be empty")
+    _require_order_number(order_number)
     body: dict[str, object] = {
         "requestId": request_id,
         "username": config.username,
@@ -217,13 +220,13 @@ def _text(value: object) -> str | None:
 def _parse_amount(value: object) -> Decimal | None:
     number = _number(value)
     raw = str(number) if number is not None else value
-    if not isinstance(raw, str):
+    if not isinstance(raw, str) or "_" in raw:
         return None
     try:
-        amount = Decimal(raw.replace(",", ""))
+        amount = Decimal(raw.replace(",", "").replace(" ", ""))
     except InvalidOperation:
         return None
-    return amount if amount.is_finite() else None
+    return amount if amount.is_finite() and amount >= 0 else None
 
 
 def _response_code(value: object) -> int | None:

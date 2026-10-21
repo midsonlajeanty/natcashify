@@ -327,3 +327,28 @@ def test_string_response_code_is_parsed() -> None:
     transaction = parse_transaction_response(json_response(_transaction_payload(responseCode="1")))
     assert transaction.status is TransactionStatus.SUCCESS
     assert transaction.response_code == 1
+
+
+@pytest.mark.parametrize("order_number", ["   ", "\t", None, 42, b"O1"])
+def test_blank_or_non_string_order_number_is_rejected(order_number: Any) -> None:
+    with pytest.raises(InvalidPaymentError, match="order_number"):
+        validate_payment(order_number, Decimal("5"), None, skip_phone_input=False)
+    with pytest.raises(InvalidPaymentError, match="order_number"):
+        build_transaction_request(
+            CONFIG, base_url=LIVE_URL, timeout=1.0, order_number=order_number, request_id="r"
+        )
+
+
+@pytest.mark.parametrize(
+    ("raw", "expected"),
+    [("3 162.00", Decimal("3162.00")), (" 1,000 000.5 ", Decimal("1000000.5"))],
+)
+def test_amount_strips_spaces_and_commas_like_php(raw: str, expected: Decimal) -> None:
+    transaction = parse_transaction_response(json_response(_transaction_payload(amount=raw)))
+    assert transaction.amount == expected
+
+
+@pytest.mark.parametrize("raw", ["-5", "-1,000.00", "1_000", "1_000.50", -3, -0.5])
+def test_negative_or_underscored_amount_is_malformed(raw: object) -> None:
+    with pytest.raises(APIError, match="amount"):
+        parse_transaction_response(json_response(_transaction_payload(amount=raw)))

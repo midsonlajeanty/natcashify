@@ -28,7 +28,7 @@ Redirect the payer to `checkout_url`. NatCash redirects them back to your `callb
 
 Violations raise `InvalidPaymentError` before any network I/O.
 
-- `order_number` must not be empty. Keep it unique per order: it is the key you will look the
+- `order_number` must be a non-blank string. Keep it unique per order: it is the key you will look the
   transaction up with.
 - `amount` is a `Decimal` or an `int`. A `float` is rejected.
 - `amount` is strictly positive, has at most 2 decimal places and is at most `999999999.99`.
