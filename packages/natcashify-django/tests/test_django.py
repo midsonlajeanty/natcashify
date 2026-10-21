@@ -1,3 +1,4 @@
+from django.core.checks import run_checks
 from django.http import HttpRequest, HttpResponse
 from django.test import AsyncRequestFactory, RequestFactory
 from django_support import SettingsOverrides
@@ -56,6 +57,17 @@ def test_check_reports_invalid_settings(settings: SettingsOverrides) -> None:
     assert "NATCASH is invalid" in error.msg
 
 
+def test_check_reports_a_non_dict_setting(settings: SettingsOverrides) -> None:
+    settings.set(NATCASH="nope")
+    [error] = check_settings()
+    assert error.id == "natcashify.E001"
+
+
+def test_check_is_registered(settings: SettingsOverrides) -> None:
+    settings.delete("NATCASH")
+    assert "natcashify.E001" in [message.id for message in run_checks()]
+
+
 @natcash_callback
 def view(request: HttpRequest, callback: Callback) -> HttpResponse:
     return HttpResponse(f"{callback.order_number}:{callback.status.name}")
@@ -91,7 +103,11 @@ async def async_view(request: HttpRequest, callback: Callback) -> HttpResponse:
 async def test_async_callback_view(
     async_rf: AsyncRequestFactory, settings: SettingsOverrides
 ) -> None:
+    get_client.cache_clear()
+    get_async_client.cache_clear()
     good = await async_view(async_rf.get("/callback", QUERY))
+    assert get_async_client.cache_info().currsize == 1
+    assert get_client.cache_info().currsize == 0
     bad = await async_view(async_rf.get("/callback", {**QUERY, "signature": "0" * 64}))
     assert (good.status_code, good.content) == (200, b"ORDER-001")
     assert bad.status_code == 400
