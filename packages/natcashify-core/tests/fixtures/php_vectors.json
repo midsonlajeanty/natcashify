@@ -1,0 +1,250 @@
+{
+    "payments": [
+        {
+            "inputs": {
+                "orderNumber": "ORDER-001",
+                "amount": "100",
+                "msisdn": null,
+                "skipPhoneInput": false,
+                "enableFee": true,
+                "language": "ht",
+                "timestamp": 1760000000000
+            },
+            "payload": {
+                "partnerCode": "PARTNER1",
+                "username": "merchant",
+                "password": "s3cr3t",
+                "callbackUrl": "https://shop.example/natcash/callback",
+                "enableFee": true,
+                "language": "ht",
+                "orderNumber": "ORDER-001",
+                "amount": 100,
+                "timestamp": 1760000000000,
+                "requestId": "f643da2f-c066-40db-9ee4-d6e3bb7734ed",
+                "skipPhoneInput": false,
+                "signature": "e40010a672d18d2370cb1439d9c70d2f632ef37e6352d8728e1dd5f3d2e7ad0e"
+            }
+        },
+        {
+            "inputs": {
+                "orderNumber": "ORDER-002",
+                "amount": "250.5",
+                "msisdn": null,
+                "skipPhoneInput": false,
+                "enableFee": true,
+                "language": "ht",
+                "timestamp": 1760000000000
+            },
+            "payload": {
+                "partnerCode": "PARTNER1",
+                "username": "merchant",
+                "password": "s3cr3t",
+                "callbackUrl": "https://shop.example/natcash/callback",
+                "enableFee": true,
+                "language": "ht",
+                "orderNumber": "ORDER-002",
+                "amount": 250.5,
+                "timestamp": 1760000000000,
+                "requestId": "565166fe-7896-462f-95e4-432cf8ae6470",
+                "skipPhoneInput": false,
+                "signature": "a2a4b35b0788381006a9b43cb0590e5940275b484e6e0a0c3c291621e20c0d33"
+            }
+        },
+        {
+            "inputs": {
+                "orderNumber": "ORDER-003",
+                "amount": "10.10",
+                "msisdn": null,
+                "skipPhoneInput": false,
+                "enableFee": true,
+                "language": "ht",
+                "timestamp": 1760000000000
+            },
+            "payload": {
+                "partnerCode": "PARTNER1",
+                "username": "merchant",
+                "password": "s3cr3t",
+                "callbackUrl": "https://shop.example/natcash/callback",
+                "enableFee": true,
+                "language": "ht",
+                "orderNumber": "ORDER-003",
+                "amount": 10.1,
+                "timestamp": 1760000000000,
+                "requestId": "017f3b78-3196-4c8f-a7e5-9a008b349769",
+                "skipPhoneInput": false,
+                "signature": "ff89d5e2b2825039fadff4cca7029c0092479519b67a495f4cbd7f8428cc61eb"
+            }
+        },
+        {
+            "inputs": {
+                "orderNumber": "ORDER-004",
+                "amount": "0.01",
+                "msisdn": null,
+                "skipPhoneInput": false,
+                "enableFee": true,
+                "language": "ht",
+                "timestamp": 1760000000000
+            },
+            "payload": {
+                "partnerCode": "PARTNER1",
+                "username": "merchant",
+                "password": "s3cr3t",
+                "callbackUrl": "https://shop.example/natcash/callback",
+                "enableFee": true,
+                "language": "ht",
+                "orderNumber": "ORDER-004",
+                "amount": 0.01,
+                "timestamp": 1760000000000,
+                "requestId": "069c7932-00ea-4704-8b79-d08a6cc23e2d",
+                "skipPhoneInput": false,
+                "signature": "67c841ff7f793f791223256a12ea88fe92a705bf8813953ae7e473bd7650fce2"
+            }
+        },
+        {
+            "inputs": {
+                "orderNumber": "ORDER-005",
+                "amount": "1234.56",
+                "msisdn": null,
+                "skipPhoneInput": false,
+                "enableFee": true,
+                "language": "ht",
+                "timestamp": 1760000000000
+            },
+            "payload": {
+                "partnerCode": "PARTNER1",
+                "username": "merchant",
+                "password": "s3cr3t",
+                "callbackUrl": "https://shop.example/natcash/callback",
+                "enableFee": true,
+                "language": "ht",
+                "orderNumber": "ORDER-005",
+                "amount": 1234.56,
+                "timestamp": 1760000000000,
+                "requestId": "4f59dc12-397a-4887-aa25-f665345513fb",
+                "skipPhoneInput": false,
+                "signature": "faa387b06476ab2dcc62d436530f9f5871bbd023cb249fc07ef93bb8e0eece5f"
+            }
+        },
+        {
+            "inputs": {
+                "orderNumber": "ORDER-006",
+                "amount": "999999999.99",
+                "msisdn": null,
+                "skipPhoneInput": false,
+                "enableFee": true,
+                "language": "ht",
+                "timestamp": 1760000000000
+            },
+            "payload": {
+                "partnerCode": "PARTNER1",
+                "username": "merchant",
+                "password": "s3cr3t",
+                "callbackUrl": "https://shop.example/natcash/callback",
+                "enableFee": true,
+                "language": "ht",
+                "orderNumber": "ORDER-006",
+                "amount": 999999999.99,
+                "timestamp": 1760000000000,
+                "requestId": "89fdc801-589e-4985-8a2b-1b547f2dedca",
+                "skipPhoneInput": false,
+                "signature": "03de2cb009f063e0a36ce9a8538fed222ed7a4b889027575ceb07a708b2a8353"
+            }
+        },
+        {
+            "inputs": {
+                "orderNumber": "ORDER-007",
+                "amount": "75",
+                "msisdn": "50912345678",
+                "skipPhoneInput": true,
+                "enableFee": true,
+                "language": "fr",
+                "timestamp": 1760000000000
+            },
+            "payload": {
+                "partnerCode": "PARTNER1",
+                "username": "merchant",
+                "password": "s3cr3t",
+                "callbackUrl": "https://shop.example/natcash/callback",
+                "enableFee": true,
+                "language": "fr",
+                "orderNumber": "ORDER-007",
+                "amount": 75,
+                "timestamp": 1760000000000,
+                "requestId": "1696782b-2341-43b4-9fb0-dc7b13975554",
+                "skipPhoneInput": true,
+                "msisdn": "50912345678",
+                "signature": "d7bae8d6a2cd2e2ccb2f8e0eab3ebf12f5160f3b7e98f6246c1be6b1cacc72ed"
+            }
+        },
+        {
+            "inputs": {
+                "orderNumber": "ORDER-008",
+                "amount": "19.99",
+                "msisdn": null,
+                "skipPhoneInput": false,
+                "enableFee": false,
+                "language": "en",
+                "timestamp": 1760000000000
+            },
+            "payload": {
+                "partnerCode": "PARTNER1",
+                "username": "merchant",
+                "password": "s3cr3t",
+                "callbackUrl": "https://shop.example/natcash/callback",
+                "enableFee": false,
+                "language": "en",
+                "orderNumber": "ORDER-008",
+                "amount": 19.99,
+                "timestamp": 1760000000000,
+                "requestId": "1f31db58-040e-498b-a91e-b1eec830648b",
+                "skipPhoneInput": false,
+                "signature": "70528aa4a96358d6c920be7d5241fbcb47a984b3ef84c49a477b0b26f407d750"
+            }
+        }
+    ],
+    "transactions": [
+        {
+            "inputs": {
+                "orderNumber": "ORDER-001"
+            },
+            "payload": {
+                "requestId": "req-fixed-0001",
+                "username": "merchant",
+                "password": "s3cr3t",
+                "partnerCode": "PARTNER1",
+                "orderNumber": "ORDER-001",
+                "signature": "539ca1419e0b7c6c6ee954559b0f006e7711feb14bbdefdf46d545c11a1b4624"
+            }
+        },
+        {
+            "inputs": {
+                "orderNumber": "ORDER-XYZ-42"
+            },
+            "payload": {
+                "requestId": "req-fixed-0001",
+                "username": "merchant",
+                "password": "s3cr3t",
+                "partnerCode": "PARTNER1",
+                "orderNumber": "ORDER-XYZ-42",
+                "signature": "da682caefc26d6361237f8f475406737f848bbbad7c9eb59e7dff6716187bb86"
+            }
+        }
+    ],
+    "callbacks": [
+        {
+            "order_number": "ORDER-001",
+            "code": 1,
+            "signature": "0bf9e11bdd3aa9f3f9f51923d6e9fde572a2832e0e8361573c82192ae8f88bf8"
+        },
+        {
+            "order_number": "ORDER-002",
+            "code": -1,
+            "signature": "d7630c5f4601fa84f4c062ce526787a5b23d3a3fd0a30c3f72d4a658f334c523"
+        },
+        {
+            "order_number": "ORDER-003",
+            "code": -3,
+            "signature": "6ec2f13a7d486cabeeacf7c28ef24078e3e204c085299966c9533bfb919760cf"
+        }
+    ]
+}
