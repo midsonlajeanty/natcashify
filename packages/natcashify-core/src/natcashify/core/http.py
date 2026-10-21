@@ -1,4 +1,5 @@
 import asyncio
+import http.client
 import urllib.error
 import urllib.request
 from collections.abc import Mapping
@@ -83,7 +84,16 @@ class UrllibTransport:
         self._opener = urllib.request.build_opener(_NoRedirect)
 
     def send(self, request: HttpRequest) -> HttpResponse:
-        _require_http_url(request.url)
+        try:
+            _require_http_url(request.url)
+            return self._perform(request)
+        except urllib.error.URLError as error:
+            cause = error.reason if isinstance(error.reason, OSError) else error
+            raise TransportError(f"HTTP request failed: {error.reason}") from cause
+        except (OSError, http.client.HTTPException, ValueError) as error:
+            raise TransportError(f"HTTP request failed: {error}") from error
+
+    def _perform(self, request: HttpRequest) -> HttpResponse:
         prepared = urllib.request.Request(  # noqa: S310 (scheme checked by _require_http_url)
             request.url,
             data=request.body,
@@ -99,11 +109,6 @@ class UrllibTransport:
         except urllib.error.HTTPError as error:
             with error:
                 return HttpResponse(error.code, dict(error.headers.items()), error.read())
-        except urllib.error.URLError as error:
-            cause = error.reason if isinstance(error.reason, OSError) else error
-            raise TransportError(f"HTTP request failed: {error.reason}") from cause
-        except OSError as error:
-            raise TransportError(f"HTTP request failed: {error}") from error
 
 
 class AsyncUrllibTransport:

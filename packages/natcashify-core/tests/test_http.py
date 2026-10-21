@@ -60,3 +60,15 @@ async def test_async_transport_delegates_to_a_thread() -> None:
     response = await AsyncUrllibTransport(inner).send(request)
     assert response.status == 204
     assert inner.requests == [request]
+
+
+@pytest.mark.parametrize("path", ["/truncated", "/truncated-error"])
+def test_urllib_transport_wraps_truncated_responses(local_server: LocalServer, path: str) -> None:
+    request = HttpRequest("POST", f"{local_server.base_url}{path}", {}, b"{}", 5.0)
+    with pytest.raises(TransportError):
+        UrllibTransport().send(request)
+
+
+def test_urllib_transport_wraps_malformed_urls() -> None:
+    with pytest.raises(TransportError):
+        UrllibTransport().send(HttpRequest("GET", "http://[bad", {}, b"", 1.0))

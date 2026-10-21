@@ -1,5 +1,4 @@
 import threading
-import time
 from collections.abc import Iterator
 from dataclasses import dataclass, field
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -18,7 +17,9 @@ class LocalServer:
 
 def _serve(handler_factory: type[BaseHTTPRequestHandler]) -> Iterator[LocalServer]:
     server = ThreadingHTTPServer(("127.0.0.1", 0), handler_factory)
-    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread = threading.Thread(
+        target=server.serve_forever, kwargs={"poll_interval": 0.01}, daemon=True
+    )
     thread.start()
     host, port = server.server_address[:2]
     local = LocalServer(f"http://{host!s}:{port}")
@@ -44,6 +45,12 @@ class _Handler(BaseHTTPRequestHandler):
             self.send_header("Content-Length", "0")
             self.end_headers()
             return
+        if self.path in {"/truncated", "/truncated-error"}:
+            self.send_response(200 if self.path == "/truncated" else 500)
+            self.send_header("Content-Length", "100")
+            self.end_headers()
+            self.wfile.write(b"short")
+            return
         body = b'{"error": "boom"}'
         self.send_response(500)
         self.send_header("Content-Type", "application/json")
@@ -56,8 +63,10 @@ class _Handler(BaseHTTPRequestHandler):
 
 
 class _SlowHandler(_Handler):
+    release: ClassVar[threading.Event]
+
     def do_POST(self) -> None:
-        time.sleep(SLOW_DELAY_SECONDS)
+        self.release.wait(timeout=SLOW_DELAY_SECONDS)
         super().do_POST()
 
 
@@ -68,4 +77,11 @@ def local_server() -> Iterator[LocalServer]:
 
 @pytest.fixture
 def slow_server() -> Iterator[LocalServer]:
-    yield from _serve(type("SlowHandler", (_SlowHandler,), {}))
+    release = threading.Event()
+    handler = type("SlowHandler", (_SlowHandler,), {"release": release})
+    served = _serve(handler)
+    try:
+        yield next(served)
+    finally:
+        release.set()
+        next(served, None)
