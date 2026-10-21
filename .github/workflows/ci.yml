@@ -69,7 +69,8 @@ jobs:
         with:
           enable-cache: true
       - run: uv sync --all-packages --resolution lowest-direct --python 3.12
-      - run: uv run --no-sync pytest -q
+      - run: uv pip install "httpx<1"
+      - run: uv run --no-sync pytest -q -W default::DeprecationWarning
 
   build:
     name: Build and validate packages
