@@ -30,6 +30,8 @@ Differences to keep in mind:
 - NatCash calls your `callback_url` with a signed query string. Verify it with `parse_callback`,
   then confirm with `get_transaction` before fulfilling, see [Callbacks](callbacks.md).
 - Amounts are `Decimal` or `int` with at most 2 decimals, and are rejected rather than rounded.
+  Convert a moncashify float with `Decimal(str(amount))`: `Decimal(10.1)` keeps the binary error
+  of the float and is rejected.
 - The async client has the same surface as the sync one.
 
 Before:
@@ -51,7 +53,7 @@ from decimal import Decimal
 from natcashify import NatcashClient
 
 with NatcashClient.from_env() as client:
-    payment = client.create_payment(order_number, Decimal(amount))
+    payment = client.create_payment(order_number, Decimal(str(amount)))
     url = payment.checkout_url
     transaction = client.get_transaction(order_number)
 ```

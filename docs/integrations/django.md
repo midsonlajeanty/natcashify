@@ -4,7 +4,7 @@
 pip install "natcashify[django]"
 ```
 
-Django 4.2 or newer.
+Django 4.2.8 or newer.
 
 ## Settings
 
