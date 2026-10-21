@@ -220,3 +220,15 @@ def test_close_calls_transport_close() -> None:
 
 def test_close_without_transport_close_is_a_no_op() -> None:
     NatcashClient(CONFIG, transport=FakeTransport()).close()
+
+
+@pytest.mark.parametrize("sandbox", [None, "false", "true", 0, 1])
+def test_non_boolean_sandbox_is_rejected(sandbox: Any) -> None:
+    with pytest.raises(ConfigurationError, match="sandbox"):
+        NatcashClient(CONFIG, sandbox=sandbox, transport=FakeTransport())
+
+
+@pytest.mark.parametrize("timeout", [None, "5", object()])
+def test_non_numeric_timeout_raises_a_configuration_error(timeout: Any) -> None:
+    with pytest.raises(ConfigurationError, match="timeout"):
+        NatcashClient(CONFIG, timeout=timeout, transport=FakeTransport())

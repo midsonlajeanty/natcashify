@@ -26,7 +26,12 @@ _DEFAULT_PREFIX: Final = "NATCASH_"
 
 
 def _validated_timeout(timeout: float, name: str = "timeout") -> float:
-    if isinstance(timeout, bool) or not math.isfinite(timeout) or timeout <= 0:
+    if (
+        isinstance(timeout, bool)
+        or not isinstance(timeout, int | float)  # pyright: ignore[reportUnnecessaryIsInstance]
+        or not math.isfinite(timeout)
+        or timeout <= 0
+    ):
         raise ConfigurationError(f"{name} must be a finite number greater than zero")
     return float(timeout)
 
@@ -93,6 +98,8 @@ def _check_order(transaction: Transaction, order_number: str, response: HttpResp
 
 class _ClientBase:
     def __init__(self, config: MerchantConfig, *, sandbox: bool, timeout: float) -> None:
+        if not isinstance(sandbox, bool):  # pyright: ignore[reportUnnecessaryIsInstance]
+            raise ConfigurationError("sandbox must be True or False")
         self._config = config
         self._sandbox = sandbox
         self._timeout = _validated_timeout(timeout)

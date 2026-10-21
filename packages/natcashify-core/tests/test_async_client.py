@@ -1,5 +1,6 @@
 import json
 from decimal import Decimal
+from typing import Any
 
 import pytest
 from php_vectors import CONFIG
@@ -90,3 +91,9 @@ async def test_aclose_calls_transport_aclose() -> None:
 
 async def test_aclose_without_transport_aclose_is_a_no_op() -> None:
     await AsyncNatcashClient(CONFIG, transport=AsyncFakeTransport()).aclose()
+
+
+@pytest.mark.parametrize("sandbox", [None, "false", 0])
+def test_async_client_rejects_a_non_boolean_sandbox(sandbox: Any) -> None:
+    with pytest.raises(ConfigurationError, match="sandbox"):
+        AsyncNatcashClient(CONFIG, sandbox=sandbox, transport=AsyncFakeTransport())
