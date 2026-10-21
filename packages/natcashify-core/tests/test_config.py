@@ -149,3 +149,26 @@ def test_from_env_never_echoes_a_rejected_secret() -> None:
         MerchantConfig.from_env(environ={**ENV, "NATCASH_PRIVATE_KEY": "  "})
     assert "NATCASH_PRIVATE_KEY" in str(caught.value)
     assert "'  '" not in str(caught.value)
+
+
+@pytest.mark.parametrize("value", [None, "true", 1, 0])
+def test_payer_pays_fee_must_be_a_boolean(value: object) -> None:
+    with pytest.raises(ConfigurationError, match="payer_pays_fee"):
+        build({"payer_pays_fee": value})
+
+
+def test_language_accepts_a_valid_plain_string() -> None:
+    config = build({"language": "fr"})
+    assert config.language is Language.FR
+
+
+@pytest.mark.parametrize("value", ["es", "", None, 1])
+def test_language_rejects_anything_else(value: object) -> None:
+    with pytest.raises(ConfigurationError, match="language"):
+        build({"language": value})
+
+
+@pytest.mark.parametrize("url", ["http://[bad", "https://[::1"])
+def test_unparsable_callback_url_is_a_configuration_error(url: str) -> None:
+    with pytest.raises(ConfigurationError, match="callback_url"):
+        build({"callback_url": url})

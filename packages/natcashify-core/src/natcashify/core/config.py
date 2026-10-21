@@ -29,6 +29,23 @@ class Language(StrEnum):
     EN = "en"
 
 
+def _language(value: object) -> Language:
+    if isinstance(value, str):
+        try:
+            return Language(value)
+        except ValueError:
+            pass
+    raise ConfigurationError("language must be one of ht, fr, en")
+
+
+def _is_http_url(value: str) -> bool:
+    try:
+        parts = urlsplit(value)
+    except ValueError:
+        return False
+    return parts.scheme in {"http", "https"} and bool(parts.netloc)
+
+
 def parse_bool(name: str, value: object) -> bool:
     if isinstance(value, bool):
         return value
@@ -58,9 +75,11 @@ class MerchantConfig:
         for name in _CREDENTIALS:
             if not _is_filled(getattr(self, name)):
                 raise ConfigurationError(f"{name} must be a non-empty string")
-        parts = urlsplit(self.callback_url)
-        if parts.scheme not in {"http", "https"} or not parts.netloc:
+        if not _is_http_url(self.callback_url):
             raise ConfigurationError("callback_url must be an absolute http(s) URL")
+        if not isinstance(self.payer_pays_fee, bool):  # pyright: ignore[reportUnnecessaryIsInstance]
+            raise ConfigurationError("payer_pays_fee must be True or False")
+        object.__setattr__(self, "language", _language(self.language))
 
     def __repr__(self) -> str:
         shown = ", ".join(

@@ -1,7 +1,8 @@
+import pytest
 from django.core.checks import run_checks
 from django.http import HttpRequest, HttpResponse
 from django.test import AsyncRequestFactory, RequestFactory
-from django_support import SettingsOverrides
+from django_support import NATCASH, SettingsOverrides
 from php_vectors import VECTORS
 
 from natcashify.core import Callback, TransactionStatus
@@ -55,6 +56,18 @@ def test_check_reports_invalid_settings(settings: SettingsOverrides) -> None:
     [error] = check_settings()
     assert error.id == "natcashify.E001"
     assert "NATCASH is invalid" in error.msg
+
+
+@pytest.mark.parametrize(
+    "override",
+    [{"CALLBACK_URL": "http://[bad"}, {"FUNCTION_CODE": None}, {"PASSWORD": "   "}],
+)
+def test_check_reports_malformed_values(
+    settings: SettingsOverrides, override: dict[str, object]
+) -> None:
+    settings.set(NATCASH={**NATCASH, **override})
+    [error] = check_settings()
+    assert error.id == "natcashify.E001"
 
 
 def test_check_reports_a_non_dict_setting(settings: SettingsOverrides) -> None:
