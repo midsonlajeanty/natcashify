@@ -1,5 +1,6 @@
 import json
 import re
+import secrets
 import time
 import uuid
 from collections.abc import Mapping, Sequence
@@ -41,7 +42,11 @@ _HEADERS: Final = {"Content-Type": "application/json", "Accept": "application/js
 
 
 def new_request_id() -> str:
-    return str(uuid.uuid4())
+    # uuid.uuid7 only exists from Python 3.14; this is the RFC 9562 layout.
+    raw = bytearray(now_ms().to_bytes(6) + secrets.token_bytes(10))
+    raw[6] = (raw[6] & 0x0F) | 0x70
+    raw[8] = (raw[8] & 0x3F) | 0x80
+    return str(uuid.UUID(bytes=bytes(raw)))
 
 
 def now_ms() -> int:

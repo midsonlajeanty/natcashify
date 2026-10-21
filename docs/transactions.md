@@ -5,7 +5,7 @@ transaction = client.get_transaction("ORDER-001")
 ```
 
 `get_transaction(order_number, *, request_id=None) -> Transaction` (awaited on the async client).
-`request_id` defaults to a fresh UUID4.
+`request_id` defaults to a fresh UUIDv7.
 
 `Transaction` is frozen:
 

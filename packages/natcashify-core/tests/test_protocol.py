@@ -1,4 +1,6 @@
 import json
+import time
+import uuid
 from datetime import timedelta
 from decimal import Decimal
 from typing import Any
@@ -129,6 +131,22 @@ def test_new_request_id_and_now_ms() -> None:
     assert new_request_id() != new_request_id()
     assert len(new_request_id()) == 36
     assert now_ms() > 1_700_000_000_000
+
+
+def test_new_request_id_is_a_uuid7_carrying_the_current_time() -> None:
+    before = now_ms()
+    request_id = uuid.UUID(new_request_id())
+    after = now_ms()
+    assert request_id.version == 7
+    assert request_id.variant == uuid.RFC_4122
+    assert before <= request_id.int >> 80 <= after
+
+
+def test_request_ids_sort_by_creation_time(monkeypatch: pytest.MonkeyPatch) -> None:
+    clock = iter([1_760_000_000_000_000_000, 1_760_000_000_001_000_000])
+    monkeypatch.setattr(time, "time_ns", lambda: next(clock))
+    first, second = new_request_id(), new_request_id()
+    assert first < second
 
 
 def test_parse_payment_response() -> None:

@@ -19,7 +19,7 @@ payment = client.create_payment(
 | `checkout_url` | `str` | Send the payer here (an absolute http(s) URL) |
 | `expires_in` | `timedelta` | How long the checkout session lasts |
 | `order_number` | `str` | The order number you passed |
-| `request_id` | `str` | Fresh UUID4 sent with this call |
+| `request_id` | `str` | Fresh UUIDv7 sent with this call |
 
 Redirect the payer to `checkout_url`. NatCash redirects them back to your `callback_url`, see
 [Callbacks](callbacks.md).
