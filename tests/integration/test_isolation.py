@@ -4,7 +4,9 @@ import sys
 from pathlib import Path
 from typing import Final
 
-FORBIDDEN: Final = frozenset({"django", "fastapi", "starlette", "flask", "werkzeug", "httpx"})
+FORBIDDEN: Final = frozenset(
+    {"django", "fastapi", "starlette", "flask", "werkzeug", "httpx", "httpx2"}
+)
 CORE_SOURCE: Final = Path(__file__).parents[2] / "packages" / "natcashify-core" / "src"
 
 

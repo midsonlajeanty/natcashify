@@ -6,7 +6,7 @@ Python SDK for the NatCash payment gateway.
 ## Layout
 
 - `packages/natcashify-core`: framework-agnostic engine, standard library only. It must never
-  import `django`, `fastapi`, `starlette`, `flask`, `werkzeug` or `httpx`;
+  import `django`, `fastapi`, `starlette`, `flask`, `werkzeug`, `httpx` or `httpx2`;
   `tests/integration/test_isolation.py` enforces it.
 - `packages/natcashify-{django,fastapi,flask}`: optional adapters.
 - `packages/natcashify`: facade distribution. It alone owns `natcashify/__init__.py`; every other
