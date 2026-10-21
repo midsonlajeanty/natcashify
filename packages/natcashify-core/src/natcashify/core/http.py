@@ -101,8 +101,7 @@ class UrllibTransport:
             method=request.method,
         )
         try:
-            # Safe: the URL has already been restricted to http and https.
-            with self._opener.open(prepared, timeout=request.timeout) as response:  # nosemgrep
+            with self._opener.open(prepared, timeout=request.timeout) as response:
                 return HttpResponse(
                     response.status, dict(response.headers.items()), response.read()
                 )
