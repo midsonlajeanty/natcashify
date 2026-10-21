@@ -1,0 +1,40 @@
+[project]
+name = "natcashify-fastapi"
+version = "0.1.0" # x-release-please-version
+description = "FastAPI integration for Natcashify."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Louis Midson LAJEANTY", email = "midsonlajeanty@proton.me" }]
+requires-python = ">=3.12"
+keywords = ["natcash", "natcom", "payments", "haiti", "sdk", "typed"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Framework :: FastAPI",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Office/Business :: Financial",
+    "Typing :: Typed",
+]
+dependencies = [
+    "natcashify-core==0.1.0", # x-release-please-version
+    "fastapi>=0.115",
+]
+
+[project.urls]
+Homepage = "https://github.com/midsonlajeanty/natcashify"
+Documentation = "https://midsonlajeanty.github.io/natcashify/"
+Issues = "https://github.com/midsonlajeanty/natcashify/issues"
+
+[build-system]
+requires = ["uv_build>=0.12,<0.14"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "natcashify.fastapi"
+
+[tool.uv.sources]
+natcashify-core = { workspace = true }

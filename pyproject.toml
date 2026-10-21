@@ -1,0 +1,90 @@
+[project]
+name = "natcashify-workspace"
+version = "0.1.0"
+description = "Development workspace for the Natcashify packages."
+readme = "README.md"
+license = "MIT"
+authors = [{ name = "Louis Midson LAJEANTY", email = "midsonlajeanty@proton.me" }]
+requires-python = ">=3.12"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "natcashify",
+    "natcashify-core",
+    "natcashify-django",
+    "natcashify-fastapi",
+    "natcashify-flask",
+    "django-stubs>=5.2",
+    "fastapi>=0.115",
+    "flask>=3.0",
+    "httpx>=0.28",
+    "lefthook>=2.2.1",
+    "pyright[nodejs]>=1.1.414",
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4",
+    "ruff>=0.16.10",
+    "twine>=7.0",
+]
+docs = [
+    "mkdocs-llmstxt>=0.5.1",
+    "mkdocs-material>=9.7.7",
+]
+
+[tool.uv]
+exclude-newer = "7 days"
+package = false
+default-groups = ["dev"]
+
+[tool.uv.workspace]
+members = ["packages/*"]
+
+[tool.uv.sources]
+natcashify = { workspace = true }
+natcashify-core = { workspace = true }
+natcashify-django = { workspace = true }
+natcashify-fastapi = { workspace = true }
+natcashify-flask = { workspace = true }
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+force-exclude = true
+extend-exclude = [".typecheck", "tests/typing/fixtures", "docs/superpowers"]
+
+[tool.ruff.lint]
+select = [
+    "A", "ARG", "B", "C4", "DTZ", "E", "F", "FA", "FBT", "I", "ISC", "N", "PGH", "PIE",
+    "PL", "PT", "PTH", "PYI", "RET", "RUF", "S", "SIM", "T20", "TC", "TID", "UP", "W",
+]
+ignore = ["PLR0913", "PLR2004", "TC001", "TC002", "TC003"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/**" = ["S101", "S105", "S106", "PLC0415", "FBT001", "FBT003", "ARG001", "ARG002"]
+"scripts/**" = ["S101", "S105", "S106", "T201", "ARG002"]
+"examples/**" = ["T201", "ARG002"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["natcashify"]
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.pyright]
+pythonVersion = "3.12"
+typeCheckingMode = "strict"
+venvPath = "."
+venv = ".venv"
+extraPaths = [".typecheck", "packages/natcashify-core/tests"]
+include = ["packages", "tests", "scripts", "examples"]
+exclude = ["**/__pycache__", "tests/typing/fixtures", "**/.venv"]
+reportMissingModuleSource = "error"
+reportUnnecessaryTypeIgnoreComment = "error"
+
+[tool.pytest.ini_options]
+addopts = ["--import-mode=importlib", "-ra", "--strict-markers", "--strict-config"]
+testpaths = ["packages", "tests"]
+pythonpath = ["packages/natcashify-core/tests"]
+filterwarnings = ["error"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
