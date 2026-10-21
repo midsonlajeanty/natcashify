@@ -11,8 +11,8 @@ Python 3.12 or newer is required.
 ## Configure
 
 `MerchantConfig` holds your merchant credentials. It validates on construction (every credential
-non-empty, `callback_url` an absolute http(s) URL) and its `repr` masks `private_key` and
-`password`.
+a non-blank string, `callback_url` an absolute http(s) URL) and its `repr` masks
+`private_key`, `function_code` (the callback signing key) and `password`.
 
 ```python
 from natcashify import Language, MerchantConfig

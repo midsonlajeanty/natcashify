@@ -16,7 +16,7 @@ _CREDENTIALS = (
     "password",
     "callback_url",
 )
-_MASKED = frozenset({"private_key", "password"})
+_MASKED = frozenset({"private_key", "function_code", "password"})
 
 
 def _is_filled(value: object) -> bool:
@@ -64,7 +64,7 @@ class MerchantConfig:
 
     def __repr__(self) -> str:
         shown = ", ".join(
-            f"{field.name}={'***' if field.name in _MASKED else repr(getattr(self, field.name))}"
+            f"{field.name}={"'***'" if field.name in _MASKED else repr(getattr(self, field.name))}"
             for field in fields(self)
         )
         return f"MerchantConfig({shown})"

@@ -53,6 +53,8 @@ def test_repr_masks_secrets() -> None:
     text = repr(build())
     assert VALID["private_key"] not in text
     assert VALID["password"] not in text
+    assert "function_code='***'" in text
+    assert "F1" not in text
     assert "partner_code='P1'" in text
 
 
