@@ -22,7 +22,7 @@ The dependencies build the client with `from_env()`, so set the `NATCASH_*` envi
 from decimal import Decimal
 from typing import Annotated
 
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, HTTPException
 from natcashify import AsyncNatcashClient
 from natcashify.fastapi import NatcashCallback, get_async_natcash_client
 
@@ -38,15 +38,21 @@ async def checkout(client: Client) -> dict[str, str]:
 
 @app.get("/natcash/callback")
 async def callback(callback: NatcashCallback, client: Client) -> dict[str, str]:
+    order = orders.get(callback.order_number)
+    if order is None:
+        raise HTTPException(status_code=404)
+    if order.is_paid:
+        return {"status": "paid"}
     transaction = await client.get_transaction(callback.order_number)
-    order = orders[callback.order_number]
     if transaction.is_successful and transaction.amount == order.amount:
+        order.mark_paid(transaction.transaction_id)
         return {"status": "paid"}
     return {"status": "not paid"}
 ```
 
 The dependency never calls `get_transaction` itself: the callback reaches your shop through the
-payer's browser, so confirm with the gateway and compare the amount before fulfilling, see
+payer's browser, so confirm with the gateway and compare the amount before fulfilling. The
+browser replays the callback on refresh, so skip orders that are already paid, see
 [Callbacks](../callbacks.md).
 
 ## Testing

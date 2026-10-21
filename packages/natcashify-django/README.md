@@ -30,5 +30,6 @@ def callback(request, callback: Callback):
     ...
 ```
 
-The decorator returns 400 on an invalid signature. Confirm the transaction before fulfilling.
+The decorator returns 400 on an invalid signature. Confirm the transaction before fulfilling,
+and skip an unknown or already paid order: the browser replays the callback on refresh.
 Documentation: <https://midsonlajeanty.github.io/natcashify/integrations/django/>

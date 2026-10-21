@@ -35,13 +35,17 @@ produced by NatCash for that order, but you should still confirm the outcome wit
 before fulfilling the order:
 
 1. Verify the callback.
-2. Call `get_transaction(callback.order_number)`.
-3. Fulfill only when `transaction.is_successful` and `transaction.amount` equals the amount of
+2. Look the order up. An unknown order number gets no fulfillment.
+3. Stop if the order is already paid: the payer's browser replays the callback on every refresh,
+   so fulfillment must run once.
+4. Call `get_transaction(callback.order_number)`.
+5. Fulfill only when `transaction.is_successful` and `transaction.amount` equals the amount of
    your order.
 
-```python
-from decimal import Decimal
+Make `mark_paid` itself idempotent too (a conditional update such as
+`UPDATE orders SET paid = true WHERE id = ? AND NOT paid`), since two replays can arrive at once.
 
+```python
 from natcashify import InvalidSignatureError, NatcashError
 
 
@@ -51,6 +55,10 @@ def handle_callback(params: dict[str, str]) -> str:
     except InvalidSignatureError:
         return "invalid"
     order = orders.get(callback.order_number)
+    if order is None:
+        return "unknown order"
+    if order.is_paid:
+        return "paid"
     try:
         transaction = client.get_transaction(callback.order_number)
     except NatcashError:

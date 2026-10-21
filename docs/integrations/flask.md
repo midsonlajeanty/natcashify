@@ -14,7 +14,7 @@ Flask 3.0 or newer. The extension is sync only.
 ```python
 from decimal import Decimal
 
-from flask import Flask, redirect
+from flask import Flask, abort, redirect
 from natcashify.core import Callback
 from natcashify.flask import Natcash
 
@@ -39,9 +39,14 @@ def checkout():
 @app.get("/natcash/callback")
 @natcash.callback
 def callback(callback: Callback):
+    order = orders.get(callback.order_number)
+    if order is None:
+        abort(404)
+    if order.is_paid:
+        return "paid"
     transaction = natcash.client.get_transaction(callback.order_number)
-    order = orders[callback.order_number]
     if transaction.is_successful and transaction.amount == order.amount:
+        order.mark_paid(transaction.transaction_id)
         return "paid"
     return "not paid"
 ```
@@ -51,7 +56,8 @@ def callback(callback: Callback):
 The `callback` decorator verifies the signature, aborts with `400` when it is invalid and passes
 the `Callback` as the first argument. It never calls `get_transaction` itself: the callback
 reaches your shop through the payer's browser, so confirm with the gateway and compare the amount
-before fulfilling, see [Callbacks](../callbacks.md).
+before fulfilling. The browser replays the callback on refresh, so skip orders that are already
+paid, see [Callbacks](../callbacks.md).
 
 ## Application factory
 

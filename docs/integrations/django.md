@@ -57,15 +57,19 @@ def checkout(request: HttpRequest) -> HttpResponse:
 returns `400` on an invalid signature. It works on sync and async views.
 
 ```python
-from django.http import HttpRequest, HttpResponse
+from django.http import Http404, HttpRequest, HttpResponse
 from natcashify.core import Callback
 from natcashify.django import get_client, natcash_callback
 
 
 @natcash_callback
 def callback(request: HttpRequest, callback: Callback) -> HttpResponse:
+    order = Order.objects.filter(number=callback.order_number).first()
+    if order is None:
+        raise Http404
+    if order.is_paid:
+        return HttpResponse("paid")
     transaction = get_client().get_transaction(callback.order_number)
-    order = Order.objects.get(number=callback.order_number)
     if transaction.is_successful and transaction.amount == order.amount:
         order.mark_paid(transaction.transaction_id)
         return HttpResponse("paid")
@@ -73,7 +77,8 @@ def callback(request: HttpRequest, callback: Callback) -> HttpResponse:
 ```
 
 The decorator never calls `get_transaction` itself: the callback reaches your shop through the
-payer's browser, so confirm with the gateway and compare the amount before fulfilling, see
+payer's browser, so confirm with the gateway and compare the amount before fulfilling. The
+browser replays the callback on refresh, so skip orders that are already paid, see
 [Callbacks](../callbacks.md).
 
 An async view uses `get_async_client()` and `await`:

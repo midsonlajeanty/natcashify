@@ -34,13 +34,16 @@ the gateway, and fulfill only when it succeeded and the amount matches your orde
 
 ```python
 callback = client.parse_callback(request_query_params)  # InvalidSignatureError if forged
-transaction = client.get_transaction(callback.order_number)
-if transaction.is_successful and transaction.amount == order.amount:
-    ...
+order = orders.get(callback.order_number)
+if order is not None and not order.is_paid:
+    transaction = client.get_transaction(callback.order_number)
+    if transaction.is_successful and transaction.amount == order.amount:
+        order.mark_paid(transaction.transaction_id)
 ```
 
 The callback reaches your shop through the payer's browser, which is why the transaction lookup
-comes before fulfilling.
+comes before fulfilling, and the browser replays it on refresh, which is why an order already
+paid is skipped.
 
 ## Rules worth knowing
 

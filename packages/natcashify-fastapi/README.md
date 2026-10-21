@@ -16,6 +16,7 @@ async def callback(callback: NatcashCallback, client: Client) -> dict[str, str]:
     ...
 ```
 
-`NatcashCallback` answers 400 on an invalid signature. Confirm the transaction before fulfilling.
+`NatcashCallback` answers 400 on an invalid signature. Confirm the transaction before fulfilling,
+and skip an unknown or already paid order: the browser replays the callback on refresh.
 The clients are built from the `NATCASH_*` environment variables.
 Documentation: <https://midsonlajeanty.github.io/natcashify/integrations/fastapi/>

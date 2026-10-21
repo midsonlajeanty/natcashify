@@ -20,5 +20,6 @@ def callback(callback: Callback):
     ...
 ```
 
-The decorator aborts with 400 on an invalid signature. Confirm the transaction before fulfilling.
+The decorator aborts with 400 on an invalid signature. Confirm the transaction before fulfilling,
+and skip an unknown or already paid order: the browser replays the callback on refresh.
 Documentation: <https://midsonlajeanty.github.io/natcashify/integrations/flask/>
