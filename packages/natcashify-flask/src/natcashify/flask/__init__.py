@@ -24,7 +24,12 @@ class Natcash:
 
     @property
     def client(self) -> NatcashClient:
-        return cast("NatcashClient", current_app.extensions[EXTENSION_KEY])
+        client = current_app.extensions.get(EXTENSION_KEY)
+        if client is None:
+            raise RuntimeError(
+                "Natcash is not initialized for this app: call Natcash(app) or init_app(app) first"
+            )
+        return cast("NatcashClient", client)
 
     def callback[**P](
         self, view: Callable[Concatenate[Callback, P], ResponseReturnValue]

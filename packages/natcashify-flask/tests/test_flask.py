@@ -88,3 +88,10 @@ def test_callback_decorator_rejects_repeated_parameters() -> None:
 def test_missing_config_raises_configuration_error() -> None:
     with pytest.raises(ConfigurationError):
         Natcash(Flask(__name__))
+
+
+def test_client_explains_a_missing_init_app() -> None:
+    natcash = Natcash(transport=FakeTransport())
+    app = make_app()
+    with app.app_context(), pytest.raises(RuntimeError, match="init_app"):
+        natcash.client  # noqa: B018
