@@ -91,9 +91,17 @@ def test_msisdn_is_omitted_when_absent() -> None:
 
 @pytest.mark.parametrize(
     ("phone", "skip"),
-    [("5091234567", False), ("40912345678", False), (None, True), ("", True), ("", False)],
+    [
+        ("5091234567", False),
+        ("509\u0661\u0662\u0663\u0664\u0665\u0666\u0667\u0668", False),
+        (12345678901, False),
+        ("40912345678", False),
+        (None, True),
+        ("", True),
+        ("", False),
+    ],
 )
-def test_invalid_phone_rules(phone: str | None, skip: bool) -> None:
+def test_invalid_phone_rules(phone: Any, skip: bool) -> None:
     with pytest.raises(InvalidPaymentError):
         validate_payment("O1", Decimal("5"), phone, skip_phone_input=skip)
 
@@ -208,6 +216,15 @@ def test_non_zero_status_raises(status: int, error: type[APIError]) -> None:
         json_response(_transaction_payload(amount="NaN")),
         json_response(_transaction_payload(transId=None)),
         json_response({"status": 0}, status=500),
+        json_response({"status": 0, "url": "https://x", "expiredAt": 1e300}),
+        json_response({"status": 0, "url": "https://x", "expiredAt": 10**20}),
+        json_response({"status": 0, "url": "https://x", "expiredAt": -1}),
+        json_response({"status": 0, "url": "https://x", "expiredAt": True}),
+        HttpResponse(200, {}, b'{"status":0,"url":"https://x","expiredAt":Infinity}'),
+        HttpResponse(200, {}, b'{"status":0,"url":"https://x","expiredAt":NaN}'),
+        json_response({"status": 0, "url": "javascript:alert(1)", "expiredAt": 5}),
+        json_response({"status": 0, "url": "/relative", "expiredAt": 5}),
+        HttpResponse(200, {}, b"[" * 100000),
     ],
 )
 def test_malformed_responses_raise_api_error(response: HttpResponse) -> None:
@@ -265,6 +282,8 @@ def test_parse_callback_accepts_single_item_sequences() -> None:
         {"orderNumber": "O1", "code": "1"},
         {"orderNumber": "O1", "code": "abc", "signature": "x"},
         {"orderNumber": "O1", "code": "01", "signature": "x"},
+        {"orderNumber": "O1", "code": "9" * 5000, "signature": "x"},
+        {"orderNumber": "O1", "code": "\u0661", "signature": "x"},
         {"orderNumber": ["O1", "O2"], "code": "1", "signature": "x"},
         {"orderNumber": [], "code": "1", "signature": "x"},
         {"orderNumber": "O1", "code": "1", "signature": "0" * 64},
@@ -293,3 +312,17 @@ def test_callback_signature_case_insensitive() -> None:
     assert verify_callback(CONFIG, case["order_number"], case["code"], upper)
     params = _params(case) | {"signature": f" {upper} "}
     assert parse_callback(CONFIG, params).is_successful
+
+
+@pytest.mark.parametrize("raw", ["9" * 5000, "\u0661", "abc", "", 10**12, 1.5, True, None])
+def test_unparseable_response_code_maps_to_unknown(raw: object) -> None:
+    transaction = parse_transaction_response(json_response(_transaction_payload(responseCode=raw)))
+    assert transaction.status is TransactionStatus.UNKNOWN
+    assert transaction.response_code is None
+    assert not transaction.is_successful
+
+
+def test_string_response_code_is_parsed() -> None:
+    transaction = parse_transaction_response(json_response(_transaction_payload(responseCode="1")))
+    assert transaction.status is TransactionStatus.SUCCESS
+    assert transaction.response_code == 1

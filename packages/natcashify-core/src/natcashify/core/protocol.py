@@ -1,4 +1,5 @@
 import json
+import math
 import re
 import time
 import uuid
@@ -6,6 +7,7 @@ from collections.abc import Mapping, Sequence
 from datetime import timedelta
 from decimal import Decimal, InvalidOperation
 from typing import Final, cast
+from urllib.parse import urlsplit
 
 from natcashify.core.config import MerchantConfig
 from natcashify.core.errors import (
@@ -31,8 +33,10 @@ PAYMENT_PATH: Final = "credential"
 TRANSACTION_PATH: Final = "merchant/checkTransaction"
 DEFAULT_TIMEOUT: Final = 10.0
 
-_PHONE: Final = re.compile(r"509\d{8}")
-_INTEGER: Final = re.compile(r"-?\d+")
+_PHONE: Final = re.compile(r"509[0-9]{8}")
+_INTEGER: Final = re.compile(r"-?[0-9]{1,9}")
+_MAX_EXPIRY_SECONDS: Final = 315_360_000
+_MAX_CODE: Final = 999_999_999
 _NOT_FOUND_STATUS: Final = 101
 _HEADERS: Final = {"Content-Type": "application/json", "Accept": "application/json"}
 
@@ -58,7 +62,7 @@ def validate_payment(
     if phone_number is None:
         if skip_phone_input:
             raise InvalidPaymentError("skip_phone_input requires a phone_number")
-    elif not _PHONE.fullmatch(phone_number):
+    elif not isinstance(phone_number, str) or not _PHONE.fullmatch(phone_number):  # pyright: ignore[reportUnnecessaryIsInstance]
         raise InvalidPaymentError("phone_number must match 509 followed by 8 digits")
     return validated
 
@@ -145,7 +149,7 @@ def _as_object_dict(value: object) -> dict[str, object] | None:
 def _decode(response: HttpResponse) -> dict[str, object] | None:
     try:
         decoded: object = json.loads(response.body)
-    except ValueError:
+    except (ValueError, RecursionError):
         return None
     return _as_object_dict(decoded)
 
@@ -176,6 +180,14 @@ def _malformed(response: HttpResponse, what: str) -> APIError:
     return APIError(f"NatCash API response has invalid {what}", http_status=response.status)
 
 
+def _is_http_url(url: str) -> bool:
+    try:
+        parts = urlsplit(url)
+    except ValueError:
+        return False
+    return parts.scheme in {"http", "https"} and bool(parts.netloc)
+
+
 def _number(value: object) -> int | float | None:
     if isinstance(value, bool) or not isinstance(value, int | float):
         return None
@@ -187,10 +199,10 @@ def parse_payment_response(
 ) -> Payment:
     payload = _envelope(response)
     url = payload.get("url")
-    if not isinstance(url, str) or not url:
+    if not isinstance(url, str) or not _is_http_url(url):
         raise _malformed(response, "url")
     seconds = _number(payload.get("expiredAt"))
-    if seconds is None or seconds < 0:
+    if seconds is None or not math.isfinite(seconds) or not 0 <= seconds <= _MAX_EXPIRY_SECONDS:
         raise _malformed(response, "expiredAt")
     return Payment(url, timedelta(seconds=seconds), order_number, request_id)
 
@@ -219,7 +231,7 @@ def _response_code(value: object) -> int | None:
     if isinstance(value, bool):
         return None
     if isinstance(value, int):
-        return value
+        return value if abs(value) <= _MAX_CODE else None
     if isinstance(value, str) and _INTEGER.fullmatch(value):
         return int(value)
     return None
