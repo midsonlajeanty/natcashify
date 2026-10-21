@@ -75,7 +75,11 @@ pythonVersion = "3.12"
 typeCheckingMode = "strict"
 venvPath = "."
 venv = ".venv"
-extraPaths = [".typecheck", "packages/natcashify-core/tests"]
+extraPaths = [
+    ".typecheck",
+    "packages/natcashify-core/tests",
+    "packages/natcashify-django/tests",
+]
 include = ["packages", "tests", "scripts", "examples"]
 exclude = ["**/__pycache__", "tests/typing/fixtures", "**/.venv"]
 reportMissingModuleSource = "error"
@@ -84,7 +88,7 @@ reportUnnecessaryTypeIgnoreComment = "error"
 [tool.pytest.ini_options]
 addopts = ["--import-mode=importlib", "-ra", "--strict-markers", "--strict-config"]
 testpaths = ["packages", "tests"]
-pythonpath = ["packages/natcashify-core/tests"]
+pythonpath = ["packages/natcashify-core/tests", "packages/natcashify-django/tests"]
 filterwarnings = ["error"]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
